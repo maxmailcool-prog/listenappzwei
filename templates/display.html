@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+<main class="ipad-layout">
+  <aside class="sidebar">
+    <div class="topline">
+      <h1>Listen</h1>
+      <a href="/logout">Logout</a>
+    </div>
+
+    <nav>
+      {% for l in lists %}
+        <a class="list-link {% if current and current.id == l.id %}active{% endif %}" href="/display?list={{ l.id }}">
+          <strong>{{ l.name }}</strong>
+          <span>{{ l.items | selectattr("checked") | list | length }}/{{ l.items | length }} erledigt</span>
+        </a>
+      {% else %}
+        <p class="empty">Keine Listen vorhanden.</p>
+      {% endfor %}
+    </nav>
+
+    <a class="ipad-link" href="/dashboard">Bearbeiten</a>
+  </aside>
+
+  <section class="panel">
+    {% if current %}
+      <h2>{{ current.name }}</h2>
+      <p class="updated">Aktualisiert: {{ current.updated_at.strftime("%Y-%m-%d %H:%M") }}</p>
+
+      <ul class="shopping-list">
+        {% for item in current.items %}
+          <li class="{% if item.checked %}checked{% endif %}">
+            <form action="/lists/{{ current.id }}/toggle/{{ item.id }}" method="post">
+              <input type="hidden" name="view" value="display">
+              <button class="check-button" type="submit">
+                <span class="box">{% if item.checked %}✓{% endif %}</span>
+                <span class="item-title">{{ item.text }}</span>
+              </button>
+            </form>
+          </li>
+        {% else %}
+          <li class="empty-item">Keine Einträge.</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <h2>Keine Liste ausgewählt</h2>
+    {% endif %}
+  </section>
+</main>
+{% endblock %}

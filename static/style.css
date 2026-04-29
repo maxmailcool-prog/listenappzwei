@@ -1,0 +1,161 @@
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, sans-serif;
+  background: #f4f6f8;
+  color: #17202a;
+}
+a { color: inherit; }
+.flash {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+}
+.flash div {
+  background: #d93a3a;
+  color: white;
+  padding: 12px 18px;
+  border-radius: 14px;
+}
+.auth-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+.auth-card {
+  width: min(440px, 100%);
+  background: white;
+  border-radius: 24px;
+  padding: 30px;
+  box-shadow: 0 12px 35px rgba(0,0,0,.1);
+}
+.auth-card h1 { margin-top: 0; font-size: 36px; }
+.auth-card form { display: grid; gap: 12px; }
+.layout, .ipad-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  min-height: 100vh;
+}
+.sidebar {
+  background: #17202a;
+  color: white;
+  padding: 24px;
+}
+.topline {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.sidebar h1 { margin: 0; }
+.small { opacity: .7; font-size: 14px; overflow-wrap: anywhere; }
+.new-form { display: grid; gap: 10px; margin: 24px 0; }
+input, textarea, button {
+  font: inherit;
+  border-radius: 12px;
+  border: 1px solid #cfd7df;
+  padding: 12px;
+}
+textarea { width: 100%; resize: vertical; line-height: 1.6; }
+button { border: 0; cursor: pointer; background: #e9eef3; }
+.primary { background: #1f7aec; color: white; font-weight: 700; }
+.danger { margin-top: 16px; background: #d93a3a; color: white; }
+.list-link {
+  display: block;
+  color: white;
+  text-decoration: none;
+  padding: 14px;
+  border-radius: 14px;
+  margin-bottom: 10px;
+  background: rgba(255,255,255,.08);
+}
+.list-link span { display: block; opacity: .75; font-size: 14px; margin-top: 4px; }
+.list-link.active { background: #1f7aec; }
+.ipad-link { display: block; margin-top: 24px; color: #b9d6ff; }
+.panel { padding: 36px; }
+label { display: block; margin: 20px 0 8px; font-weight: 700; }
+.title-input { width: 100%; font-size: 24px; font-weight: 800; }
+.actions { margin-top: 18px; }
+.empty { opacity: .7; }
+
+.editor-items { display: grid; gap: 10px; }
+.editor-row {
+  display: grid;
+  grid-template-columns: 46px 1fr;
+  gap: 10px;
+  align-items: center;
+  background: white;
+  padding: 10px;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0,0,0,.05);
+}
+.editor-row input[type="checkbox"] { width: 28px; height: 28px; accent-color: #19a55a; }
+.editor-row input:not([type="checkbox"]) { width: 100%; color: #17202a; background: white; }
+.editor-row.checked { background: #d9f7e7; }
+.editor-row.checked input:not([type="checkbox"]) { text-decoration: line-through; color: #146c3e; }
+
+.ipad-layout .panel h2 { font-size: 42px; margin-bottom: 0; }
+.updated { color: #667; }
+.shopping-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 24px;
+  display: grid;
+  gap: 14px;
+}
+.shopping-list li {
+  background: white;
+  border-radius: 18px;
+  font-size: 30px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.08);
+  overflow: hidden;
+  color: #17202a;
+}
+.shopping-list li.checked {
+  background: #d9f7e7;
+  color: #146c3e;
+}
+.shopping-list li.checked .item-title { text-decoration: line-through; }
+.check-button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  text-align: left;
+  background: transparent;
+  color: inherit;
+  font-size: inherit;
+  padding: 24px;
+  min-height: 92px;
+}
+.box {
+  flex: 0 0 46px;
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  border: 3px solid #19a55a;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  color: #19a55a;
+}
+.item-title {
+  display: block;
+  flex: 1 1 auto;
+  color: inherit;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  line-height: 1.25;
+}
+.empty-item { padding: 24px; opacity: .7; }
+
+@media (max-width: 800px) {
+  .layout, .ipad-layout { grid-template-columns: 1fr; }
+  .sidebar { min-height: auto; }
+  .panel { padding: 20px; }
+  .shopping-list li { font-size: 26px; }
+}

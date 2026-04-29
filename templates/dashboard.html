@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block content %}
+<main class="layout">
+  <aside class="sidebar">
+    <div class="topline">
+      <h1>Listen</h1>
+      <a href="/logout">Logout</a>
+    </div>
+    <p class="small">{{ current_user.email }}</p>
+
+    <form action="/lists/new" method="post" class="new-form">
+      <input name="name" placeholder="Neuer Listenname" required>
+      <button>Erstellen</button>
+    </form>
+
+    <nav>
+      {% for l in lists %}
+        <a class="list-link {% if current and current.id == l.id %}active{% endif %}" href="/dashboard?list={{ l.id }}">
+          <strong>{{ l.name }}</strong>
+          <span>{{ l.items | selectattr("checked") | list | length }}/{{ l.items | length }} erledigt</span>
+        </a>
+      {% else %}
+        <p class="empty">Noch keine Liste vorhanden.</p>
+      {% endfor %}
+    </nav>
+
+    <a class="ipad-link" href="/display">Anzeige öffnen</a>
+  </aside>
+
+  <section class="panel">
+    {% if current %}
+      <form action="/lists/{{ current.id }}/save" method="post">
+        <label>Listenname</label>
+        <input class="title-input" name="name" value="{{ current.name }}" required>
+
+        <label>Artikel abhaken oder bearbeiten</label>
+        <div class="editor-items">
+          {% for item in current.items %}
+            <div class="editor-row {% if item.checked %}checked{% endif %}">
+              <input type="checkbox" name="checked_id" value="{{ item.id }}" {% if item.checked %}checked{% endif %}>
+              <input name="text_{{ item.id }}" value="{{ item.text }}">
+            </div>
+          {% else %}
+            <p class="empty">Noch keine Artikel.</p>
+          {% endfor %}
+        </div>
+
+        <label>Neue Artikel – ein Eintrag pro Zeile</label>
+        <textarea name="new_items" rows="6" placeholder="Milch&#10;Brot&#10;Äpfel"></textarea>
+
+        <div class="actions">
+          <button class="primary">Speichern</button>
+        </div>
+      </form>
+
+      <form action="/lists/{{ current.id }}/delete" method="post" onsubmit="return confirm('Liste wirklich löschen?')">
+        <button class="danger">Liste löschen</button>
+      </form>
+    {% else %}
+      <div class="welcome">
+        <h2>Erstelle links deine erste Einkaufsliste.</h2>
+      </div>
+    {% endif %}
+  </section>
+</main>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<main class="auth-page">
+  <section class="auth-card">
+    <h1>{% if mode == "login" %}Einloggen{% else %}Registrieren{% endif %}</h1>
+    <p>Jeder Benutzer sieht nur seine eigenen Einkaufslisten.</p>
+
+    <form method="post">
+      <label>E-Mail</label>
+      <input type="email" name="email" required>
+
+      <label>Passwort</label>
+      <input type="password" name="password" minlength="6" required>
+
+      <button class="primary">
+        {% if mode == "login" %}Einloggen{% else %}Konto erstellen{% endif %}
+      </button>
+    </form>
+
+    {% if mode == "login" %}
+      <p>Noch kein Konto? <a href="/register">Registrieren</a></p>
+    {% else %}
+      <p>Schon ein Konto? <a href="/login">Einloggen</a></p>
+    {% endif %}
+  </section>
+</main>
+{% endblock %}
