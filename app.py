@@ -1,6 +1,5 @@
 import os
 from datetime import datetime
-from urllib.parse import urlparse
 
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
@@ -12,9 +11,14 @@ app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-secret-change-me")
 
 database_url = os.environ.get("DATABASE_URL", "sqlite:///shopping.db")
-# Render/Heroku geben manchmal postgres:// aus, SQLAlchemy erwartet postgresql://
+
+# Render/Heroku geben manchmal postgres:// aus
 if database_url.startswith("postgres://"):
     database_url = database_url.replace("postgres://", "postgresql://", 1)
+
+# Wichtig für psycopg 3 auf Render
+if database_url.startswith("postgresql://"):
+    database_url = database_url.replace("postgresql://", "postgresql+psycopg://", 1)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -39,7 +43,13 @@ class ShoppingList(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
 
-    items = db.relationship("Item", backref="shopping_list", lazy=True, cascade="all, delete-orphan", order_by="Item.position")
+    items = db.relationship(
+        "Item",
+        backref="shopping_list",
+        lazy=True,
+        cascade="all, delete-orphan",
+        order_by="Item.position",
+    )
 
 
 class Item(db.Model):
@@ -132,11 +142,13 @@ def logout():
 def dashboard():
     lists = ShoppingList.query.filter_by(user_id=current_user.id).order_by(ShoppingList.updated_at.desc()).all()
     selected_id = request.args.get("list", type=int)
+
     current = None
     if selected_id:
         current = get_user_list_or_404(selected_id)
     elif lists:
         current = lists[0]
+
     return render_template("dashboard.html", lists=lists, current=current)
 
 
@@ -150,6 +162,7 @@ def new_list():
     shopping_list = ShoppingList(name=name, user_id=current_user.id)
     db.session.add(shopping_list)
     db.session.commit()
+
     return redirect(url_for("dashboard", list=shopping_list.id))
 
 
@@ -159,11 +172,7 @@ def save_list(list_id):
     shopping_list = get_user_list_or_404(list_id)
     shopping_list.name = request.form.get("name", shopping_list.name).strip() or shopping_list.name
 
-    texts = request.form.getlist("item_text")
     checked_ids = set(request.form.getlist("checked_id"))
-
-    existing_items = {str(item.id): item for item in shopping_list.items}
-    new_order = []
 
     pos = 0
     for item in list(shopping_list.items):
@@ -172,7 +181,6 @@ def save_list(list_id):
             item.text = text
             item.checked = str(item.id) in checked_ids
             item.position = pos
-            new_order.append(item)
             pos += 1
         else:
             db.session.delete(item)
@@ -186,6 +194,7 @@ def save_list(list_id):
 
     shopping_list.updated_at = datetime.utcnow()
     db.session.commit()
+
     return redirect(url_for("dashboard", list=shopping_list.id))
 
 
@@ -194,6 +203,7 @@ def save_list(list_id):
 def toggle_item(list_id, item_id):
     shopping_list = get_user_list_or_404(list_id)
     item = Item.query.filter_by(id=item_id, list_id=shopping_list.id).first_or_404()
+
     item.checked = not item.checked
     shopping_list.updated_at = datetime.utcnow()
     db.session.commit()
@@ -201,6 +211,7 @@ def toggle_item(list_id, item_id):
     view = request.form.get("view", "dashboard")
     if view == "display":
         return redirect(url_for("display", list=list_id))
+
     return redirect(url_for("dashboard", list=list_id))
 
 
@@ -210,6 +221,7 @@ def delete_list(list_id):
     shopping_list = get_user_list_or_404(list_id)
     db.session.delete(shopping_list)
     db.session.commit()
+
     return redirect(url_for("dashboard"))
 
 
@@ -218,11 +230,13 @@ def delete_list(list_id):
 def display():
     lists = ShoppingList.query.filter_by(user_id=current_user.id).order_by(ShoppingList.updated_at.desc()).all()
     selected_id = request.args.get("list", type=int)
+
     current = None
     if selected_id:
         current = get_user_list_or_404(selected_id)
     elif lists:
         current = lists[0]
+
     return render_template("display.html", lists=lists, current=current)
 
 
